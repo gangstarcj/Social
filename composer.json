@@ -1,5 +1,5 @@
 {
-    "name": "phpixie/social",
+    "name": "datainlife/social",
     "description": "PHPixie library for social OAuth APis: facebook, twitter, google and vk",
     "keywords": ["social", "auth", "facebook", "twitter", "google", "vk", "oauth"],
     "homepage": "http://phpixie.com",
