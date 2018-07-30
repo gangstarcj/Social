@@ -49,7 +49,36 @@ class Provider extends \PHPixie\Social\OAuth\OAuth2\Provider
 
         return $loginData;
     }
+public function handleCallback($callbackUrl, $callbackData)
+    {
+        if (!isset($callbackData['code'])) {
+            return null;
+        }
 
+        $baseParameters = array(
+            'client_id'     => $this->configData->getRequired('appId'),
+            'client_secret' => $this->configData->getRequired('appSecret'),
+            'redirect_uri'  => $callbackUrl,
+            'code'          => $callbackData['code'],
+        );
+
+        $tokenData = $this->getTokenResponse($callbackData, $baseParameters);
+        $tokenData = $this->decodeApiResponse($tokenData);
+
+        $loginData = $this->apiCall(
+            $tokenData->access_token,
+            'GET',
+            $this->loginDataEndpoint,
+            ['v' => $this->configData->get('apiVersion', '5.52')]
+        );
+
+        $loginData = $this->normalizeLoginData($loginData, $tokenData);
+
+        $token = $this->buildToken($tokenData, $loginData);
+
+        return $this->user($token, $loginData);
+    }
+    
     public function api($token, $method, $endpoint, $query = array(), $data = null)
     {
         $query['version'] = $this->configData->get('apiVersion', '5.52');
